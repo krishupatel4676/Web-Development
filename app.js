@@ -1,64 +1,76 @@
-
 const express = require("express");
-
-const https = require("https");
-
 const bodyParser = require("body-parser");
+const request = require("request");
+const https = require("https");
 
 const app = express();
 
+app.use(express.static("public"));
+
 app.use(bodyParser.urlencoded({extended:true}));
 
+
+
 app.get("/", function(req, res){
-
-  res.sendFile(__dirname + "/index.html")
-
-});
+  res.sendFile(__dirname + "/signup.html");
+})
 
 app.post("/", function(req,res){
 
+  const firstName = req.body.fname;
+  const lastName = req.body.lname;
+  const email = req.body.email;
+  const data ={
+    members:[
+      {
+        email_address: email,
+        status:"subscribed",
+        merge_fields:{
+          FNAME:firstName,
+          LNAME:lastName
+        }
+      }
+    ]
+  };
 
-const query = req.body.cityName;
+  const jsonData = JSON.stringify(data);
 
-const apiKey = "8ea25b7fe17f615b9d455a4cfc501829";
+  const url = "https://us1.api.mailchimp.com/3.0/lists/855fa6d1f6"
 
-const units = "metric";
+  const options = {
+    method:"POST",
+    auth:"Krishna:0bc14699043124396b07fc2bd4fe12e9-us1"
 
-const url = "https://api.openweathermap.org/data/2.5/weather?q="+ query +"&appid="+ apiKey +"&units="+ units +""
+  }
+  const request =  https.request(url, options, function(response){
 
-https.get(url, function(response){
-  console.log(response.statusCode);
+     if(response.statusCode === 200){
+       res.sendFile(__dirname + "/success.html");
+     }
+     else{
+       res.sendFile(__dirname + "/failure.html");
+     }
 
-  response.on("data", function(data){
-
-  const weatherData = JSON.parse(data)
-
-  const temp = weatherData.main.temp;
-
-  const weatherDescription = weatherData.weather[0].description
-
-  const icon = weatherData.weather[0].icon
-
-  const imageURL = "http://openweathermap.org/img/wn/"+ icon +"@2x.png"
-
-   res.write("<p>The weather is currently " + weatherDescription + "</p>");
-
-   res.write("<h1>The temperatre in "+ query +" is " + temp + " degree Celcius.</h1>");
-
-   res.write("<img src="+imageURL  +">")
-
-   res.send()
-
- });
-});
+     response.on("data", function(data){
+       console.log(JSON.parse(data));
+     })
+   })
 
 
+   request.write(jsonData);
+   request.end();
 })
 
+app.post("/failure", function(req, res){
+  res.redirect("/");
+})
 
-
-app.listen(3000, function(){
-
-  console.log("Server is running on port 3000.");
-
+app.listen(process.env.PORT || 3000, function(){
+  console.log("Server is running on port 3000");
 });
+
+//API Key
+// 0bc14699043124396b07fc2bd4fe12e9-us1
+
+//Audience ID
+//855fa6d1f6
