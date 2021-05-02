@@ -1,15 +1,15 @@
 {
-  "name": "my-express-server",
+  "name": "weatherproject",
   "version": "1.0.0",
-  "description": "This is a first express server",
-  "main": "server.js",
+  "description": "",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Krishna Patel",
+  "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "express": "^4.17.1"
   }
 }
